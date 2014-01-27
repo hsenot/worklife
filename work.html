@@ -7,17 +7,41 @@
     <link href="jSlabify/css/jSlabify.css" rel="stylesheet" type="text/css" />
 
     <style>
-        /* Set font-sizes for the headings to be given the slabText treatment */
-        h1 {
-          text-align:left;
-          font-family:'LeagueGothicRegular', "Impact", Charcoal, Arial Black, Gadget, Sans serif;
+      @font-face {                            
+          font-family: 'LeagueGothicRegular';
+          src: url('font/League_Gothic-webfont.eot');
+          src: url('font/League_Gothic-webfont.eot?#iefix') format('embedded-opentype'),
+          url('font/League_Gothic-webfont.woff') format('woff'),
+          url('font/League_Gothic-webfont.ttf') format('truetype'),
+          url('font/League_Gothic-webfont.svg#LeagueGothicRegular') format('svg');
+          font-weight: normal;
+          font-style: normal;
+      } 
+
+      html {
+           overflow  : -moz-scrollbars-vertical;
+           overflow-y: scroll;
+      }
+
+      #slabwrap {
+          width: 400px;
+          padding: 20px;
+          border: 1px solid #000;
+          
+          font-family: 'LeagueGothicRegular', Charcoal, Arial Black, Gadget, Sans serif;
+          font-weight: normal;
+          line-height: .9;
           text-transform: uppercase;
-          line-height:1;
-          color:#222;
-          font-size:300%;
-          /* Remember to set the correct font weight if using fontface */
-          font-weight:normal;
-        }
+      }
+      .amp {
+          font-family:Baskerville,'Goudy Old Style',Palatino,'Book Antiqua',serif;
+          font-style:italic;
+          font-weight:lighter;
+      }
+
+      #error {
+          color: red;
+      }
     </style>
 
     <!--[if lte IE 7]>
@@ -33,19 +57,23 @@
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
   </head>
-  <body>
+  <body style="overflow:hidden;">
 
-  <!--div id="wrapper" style="display:table;">
-    <div id="cell" style="display:table-cell; vertical-align:middle;">
-      <div-->
-        <h1 id="h1"></h1>
-      <!--/div>
-    </div>
-  </div-->
+    <center>
+        <div id="slabwrap">
+            <div class="slabme">
+            </div>
+        </div>
+    </center>
 
   <script src="jquery-1.11.0.min.js"></script>
   <script src="jSlabify/js/jquery.jSlabify.min.js"></script>
   <script>
+
+    function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    
     // Waiting times in seconds
     var timeToWaitNextTweet = 10;
     var timeToWaitLoadTweets = 120;
@@ -70,56 +98,58 @@
         };
     }    
 
-    // Function to slabtext the H1 headings
-    function slabTextHeadlines() {
-        $("h1").jSlabify({
-            vCenter        : true,
-            //hCenter        : true,
-            fixedHeight    : true,
+    $(window).on("load",function(){
+
+      function slab_it_now(txt) {
+        var val   = txt;
+        var ratio = 1.54;
+        $('#slabwrap .slabme').html(val);
+        $("#slabwrap .slabme").jSlabify({
             constrainHeight: true,
-            // For an iPhone 3G horizontal display: 1.5
-            // For an iPhone 3G vertical display:   0.667
-            slabRatio      : 1.5
+            slabRatio      : ratio,
+            hCenter        : true,
+            vCenter        : true
         });
-    };
-
-    function showOneStatus(status) {
-      // Selecting the text of a random tweet in the batch
-      var tw = status.text;
-      // Removing links
-      tw_stripped = tw.striplinks();
-      // Put the tweet text there
-      $('h1').html(tw_stripped);
-      // Slab it
-      slabTextHeadlines();      
-    }
-
-    function exhaustStatuses(statuses) {
-      if (statuses.length)
-      {
-        // Display one status, and shift the array
-        showOneStatus(statuses.shift());
-        // Exhaust the rest
-        setTimeout(function(){
-          exhaustStatuses(statuses);
-        }, timeToWaitNextTweet*1000);
       }
-    }
 
-    function getNewTweets() {
-      // Get the tweets and slab the text!
-      $.getJSON("get_tweet.php?about=work", function(json){
-        if (json.statuses)
+      function showOneStatus(status) {
+        // Selecting the text of a random tweet in the batch
+        var tw = status.text;
+        // Removing links
+        tw_stripped = tw.striplinks();
+        // Slab it now
+        slab_it_now(tw_stripped);
+      }
+
+      function exhaustStatuses(statuses) {
+        if (statuses.length)
         {
-          // This will take 1 minute
-          exhaustStatuses(json.statuses)
-          // We request new tweets after 60 seconds
-          setTimeout(getNewTweets,timeToWaitLoadTweets*1000)
+          // Display one status, and shift the array
+          showOneStatus(statuses.shift());
+          // Exhaust the rest
+          setTimeout(function(){
+            exhaustStatuses(statuses);
+          }, timeToWaitNextTweet*1000);
         }
-      });      
-    }
+      }
 
-    getNewTweets();
+      function getNewTweets() {
+        // Get the tweets and slab the text!
+        $.getJSON("get_tweet.php?about=work", function(json){
+          if (json.statuses)
+          {
+            // This will take 1 minute
+            exhaustStatuses(json.statuses)
+            // We request new tweets after 60 seconds
+            setTimeout(getNewTweets,timeToWaitLoadTweets*1000)
+          }
+        });      
+      }
+
+      getNewTweets();
+
+    });
+
 
   </script>
 
