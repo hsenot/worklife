@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <title>Work/Life</title>
+    <!-- slabtext stylesheet -->
+    <link href="slabText/css/slabtext.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        /* Set font-sizes for the headings to be given the slabText treatment */
+        h1 {
+          text-align:left;
+          font-family:'LeagueGothicRegular', "Impact", Charcoal, Arial Black, Gadget, Sans serif;
+          text-transform: uppercase;
+          line-height:1;
+          color:#222;
+          font-size:300%;
+          /* Remember to set the correct font weight if using fontface */
+          font-weight:normal;
+        }
+    </style>
+
+    <!--[if lte IE 7]>
+      <style>
+      body
+          {
+          width:960px;
+          margin:0 auto;
+          }
+      </style>
+    <![endif]-->
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+  <h1></h1>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="slabText/js/jquery.slabtext.min.js"></script>
+  <script>
+    // Waiting times in seconds
+    var timeToWaitNextTweet = 10;
+    var timeToWaitLoadTweets = 120;
+
+    // Function cleanup the tweets
+    if(!String.striplinks) {
+        String.prototype.striplinks = function() {
+
+            // http://, https://, ftp://
+            var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+
+            // www. sans http:// or https://
+            var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+
+            // Email addresses
+            var emailAddressPattern = /\w+@[a-zA-Z_]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+            return this
+                .replace(urlPattern, '')
+                .replace(pseudoUrlPattern, '')
+                .replace(emailAddressPattern, '');
+        };
+    }    
+
+    // Function to slabtext the H1 headings
+    function slabTextHeadlines() {
+        $("h1").slabText({
+            // Don't slabtext the headers if the viewport is under 380px
+            "viewportBreakpoint":380
+        });
+    };
+
+    function showOneStatus(status) {
+      // Selecting the text of a random tweet in the batch
+      var tw = status.text;
+      // Removing links
+      tw_stripped = tw.striplinks();
+      // Put the tweet text there
+      $('h1').html(tw_stripped);
+      // Slab it
+      slabTextHeadlines();      
+    }
+
+    function exhaustStatuses(statuses) {
+      if (statuses.length)
+      {
+        // Display one status, and shift the array
+        showOneStatus(statuses.shift());
+        // Exhaust the rest
+        setTimeout(function(){
+          exhaustStatuses(statuses);
+        }, timeToWaitNextTweet*1000);
+      }
+    }
+
+    function getNewTweets() {
+      // Get the tweets and slab the text!
+      $.getJSON("get_tweet.php?about=work", function(json){
+        if (json.statuses)
+        {
+          // This will take 1 minute
+          exhaustStatuses(json.statuses)
+          // We request new tweets after 60 seconds
+          setTimeout(getNewTweets,timeToWaitLoadTweets*1000)
+        }
+      });      
+    }
+
+    getNewTweets();
+
+  </script>
+
+  </body>
+</html>
+    
