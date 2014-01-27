@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>Work/Life</title>
     <!-- slabtext stylesheet -->
-    <link href="slabText/css/slabtext.css" rel="stylesheet" type="text/css" />
+    <link href="jSlabify/css/jSlabify.css" rel="stylesheet" type="text/css" />
 
     <style>
         /* Set font-sizes for the headings to be given the slabText treatment */
@@ -35,10 +35,16 @@
   </head>
   <body>
 
-  <h1></h1>
+  <!--div id="wrapper" style="display:table;">
+    <div id="cell" style="display:table-cell; vertical-align:middle;">
+      <div-->
+        <h1 id="h1"></h1>
+      <!--/div>
+    </div>
+  </div-->
 
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-  <script src="slabText/js/jquery.slabtext.min.js"></script>
+  <script src="jquery-1.11.0.min.js"></script>
+  <script src="jSlabify/js/jquery.jSlabify.min.js"></script>
   <script>
     // Waiting times in seconds
     var timeToWaitNextTweet = 10;
@@ -66,9 +72,14 @@
 
     // Function to slabtext the H1 headings
     function slabTextHeadlines() {
-        $("h1").slabText({
-            // Don't slabtext the headers if the viewport is under 380px
-            "viewportBreakpoint":380
+        $("h1").jSlabify({
+            vCenter        : true,
+            //hCenter        : true,
+            fixedHeight    : true,
+            constrainHeight: true,
+            // For an iPhone 3G horizontal display: 1.5
+            // For an iPhone 3G vertical display:   0.667
+            slabRatio      : 1.5
         });
     };
 
