@@ -100,9 +100,12 @@
 
     $(window).on("load",function(){
 
+      $('#slabwrap').width($(window).width()-80);
+
       function slab_it_now(txt) {
         var val   = txt;
-        var ratio = 1.54;
+        // For an iPhone 3 (horizontal display): 1.54
+        var ratio = ($(window).width()-80)/($(window).height()-60);
         $('#slabwrap .slabme').html(val);
         $("#slabwrap .slabme").jSlabify({
             constrainHeight: true,
